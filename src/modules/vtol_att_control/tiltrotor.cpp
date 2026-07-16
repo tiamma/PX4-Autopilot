@@ -464,7 +464,7 @@ bool Tiltrotor::checkSlewParams() const
 
 	// 检查角度断点必须递增：0 < ang_1 < ang_2 < 90
 	if (ang_1 <= 0 || ang_2 <= ang_1 || ang_2 >= 90) {
-		PX4_ERR("倾转参数错误：角度断点必须递增 (0 < %d < %d < 90)", ang_1, ang_2);
+		PX4_ERR("倾转参数错误：角度断点必须递增 (0 < %d < %d < 90)", (int)ang_1, (int)ang_2);
 		return false;
 	}
 
