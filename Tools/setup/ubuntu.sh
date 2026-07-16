@@ -176,8 +176,16 @@ if [[ $INSTALL_NUTTX == "true" ]]; then
 
 		echo
 		echo "Fetching Xtensa compilers"
-		wget -q -P $DIR https://github.com/espressif/crosstool-NG/releases/download/esp-13.2.0_20240530/xtensa-esp-elf-13.2.0_20240530-x86_64-linux-gnu.tar.xz
-		sudo tar -xf $DIR/xtensa-esp-elf-13.2.0_20240530-x86_64-linux-gnu.tar.xz -C /opt
+		# wget -P $DIR https://github.com/espressif/crosstool-NG/releases/download/esp-13.2.0_20260203/xtensa-esp-elf-13.2.0_20260203-x86_64-linux-gnu.tar.xz
+
+		wget \
+		-e "http_proxy=http://127.0.0.1:56419" \
+		-e "https_proxy=http://127.0.0.1:56419" \
+		--progress=bar:force:noscroll \
+		-P $DIR \
+		https://github.com/espressif/crosstool-NG/releases/download/esp-13.2.0_20260203/xtensa-esp-elf-13.2.0_20260203-x86_64-linux-gnu.tar.xz
+
+		sudo tar -xf $DIR/xtensa-esp-elf-13.2.0_20260203-x86_64-linux-gnu.tar.xz -C /opt
 		echo 'export PATH=$PATH:/opt/xtensa-esp-elf/bin/' >> /home/$USER/.bashrc
 	fi
 
@@ -209,7 +217,7 @@ if [[ $INSTALL_SIM == "true" ]]; then
 	if [[ "${UBUNTU_RELEASE}" == "18.04" || "${UBUNTU_RELEASE}" == "20.04" ]]; then
 		sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
 		wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-		# Update list, since new gazebo-stable.list has been added
+		# Update list, since new gazebo-sstable.list has been added
 		sudo apt-get update -y --quiet
 
 		# Install Gazebo classic

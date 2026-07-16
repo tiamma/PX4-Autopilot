@@ -4,9 +4,9 @@
 
 已成功将 BH_Pilot 项目中基于空速的智能倾转调度逻辑移植到 PX4-Autopilot。
 
-**实施日期：** 2026-07-14  
-**修改文件数：** 3 个核心文件  
-**新增代码行数：** ~550 行  
+**实施日期：** 2026-07-14
+**修改文件数：** 3 个核心文件
+**新增代码行数：** ~550 行
 **新增参数数量：** 14 个
 
 ---
@@ -34,7 +34,7 @@ enum class AirspeedTiltMode : uint8_t {
 /**
  * 反向过渡状态机 - 管理从固定翼到多旋翼的过渡过程
  */
-enum class BackTransitionState : uint8_t {
+ccc
     CHECK = 0,      // 等待空速进入反向过渡窗口
     TIMER = 1,      // 执行反向倾转，逐步恢复 VTOL 控制
     DONE = 2        // 倾转归零，恢复完全 VTOL 姿态控制
@@ -134,7 +134,7 @@ if (arsp_1 <= 0.0f || arsp_2 <= arsp_1 || arsp_min <= arsp_2) {
 ```cpp
 // 物理合理性检查：与地速对比（简化版，实际应考虑风速）
 if (_local_pos->v_xy_valid) {
-    const float ground_speed = sqrtf(_local_pos->vx * _local_pos->vx + 
+    const float ground_speed = sqrtf(_local_pos->vx * _local_pos->vx +
                                      _local_pos->vy * _local_pos->vy);
     // 如果空速与地速差异过大（超过15m/s），可能传感器异常
     if (fabsf(airspeed - ground_speed) > 15.0f) {
@@ -195,9 +195,9 @@ if (time_ms <= time1 && time_ms > 500.0f) {
 **代码示例：**
 ```cpp
 // 根据姿态误差动态调整：如果姿态偏差大，暂停倾转
-const float pitch_error = fabsf(Eulerf(Quatf(_v_att_sp->q_d)).theta() - 
+const float pitch_error = fabsf(Eulerf(Quatf(_v_att_sp->q_d)).theta() -
                                  Eulerf(Quatf(_v_att->q)).theta());
-const float roll_error = fabsf(Eulerf(Quatf(_v_att_sp->q_d)).phi() - 
+const float roll_error = fabsf(Eulerf(Quatf(_v_att_sp->q_d)).phi() -
                                 Eulerf(Quatf(_v_att->q)).phi());
 
 if (pitch_error > 0.3f || roll_error > 0.3f) {  // 约17度
@@ -307,9 +307,9 @@ VT_BT_TIME2 = 4000          # 阶段2时长 (ms)
 void Tiltrotor::update_transition_state()
 {
     VtolType::update_transition_state();
-    
+
     // ... 现有代码 ...
-    
+
     if (_vtol_mode == vtol_mode::TRANSITION_FRONT_P1) {
         // 使用新的空速倾转调度（可选启用）
         if (_param_vt_tilt_rate_en.get()) {
@@ -319,7 +319,7 @@ void Tiltrotor::update_transition_state()
             // 保留原有基于时间的逻辑
             // ... 现有代码 ...
         }
-        
+
     } else if (_vtol_mode == vtol_mode::TRANSITION_BACK) {
         // 使用新的反向倾转控制
         _tilt_mode = AirspeedTiltMode::BACK_TRANSITION;
@@ -443,9 +443,9 @@ VT_TILT_1_ANG = 30
 
 已成功完成 PX4 倾转旋翼改进方案的核心代码实施：
 
-✅ **数据结构** - 新增枚举、成员变量、参数声明  
-✅ **核心算法** - 实现三段线性调度、时间曲线、速率限制  
-✅ **参数定义** - 14个新参数，完整的中文注释  
-✅ **安全保护** - 参数验证、空速检查、姿态保护、状态机保护  
+✅ **数据结构** - 新增枚举、成员变量、参数声明
+✅ **核心算法** - 实现三段线性调度、时间曲线、速率限制
+✅ **参数定义** - 14个新参数，完整的中文注释
+✅ **安全保护** - 参数验证、空速检查、姿态保护、状态机保护
 
 **下一步：** 集成到现有过渡逻辑 → 编译验证 → SITL 测试 → 实机测试

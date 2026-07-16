@@ -457,14 +457,14 @@ bool Tiltrotor::checkSlewParams() const
 
 	// 检查空速断点必须递增：0 < arsp_1 < arsp_2 < arsp_min
 	if (arsp_1 <= 0.0f || arsp_2 <= arsp_1 || arsp_min <= arsp_2) {
-		PX4_ERR("倾转参数错误：空速断点必须递增 (0 < %.1f < %.1f < %.1f)",
+		PX4_ERR("tilt parameter error: airspeed breakpoints must increase (0 < %.1f < %.1f < %.1f)",
 			(double)arsp_1, (double)arsp_2, (double)arsp_min);
 		return false;
 	}
 
 	// 检查角度断点必须递增：0 < ang_1 < ang_2 < 90
 	if (ang_1 <= 0 || ang_2 <= ang_1 || ang_2 >= 90) {
-		PX4_ERR("倾转参数错误：角度断点必须递增 (0 < %d < %d < 90)", (int)ang_1, (int)ang_2);
+		PX4_ERR("tilt parameter error: angle breakpoints must increase (0 < %d < %d < 90)", (int)ang_1, (int)ang_2);
 		return false;
 	}
 
@@ -473,7 +473,7 @@ bool Tiltrotor::checkSlewParams() const
 	const float bt_time2 = _param_vt_bt_time2.get();
 
 	if (bt_time1 <= 500.0f || bt_time2 <= bt_time1) {
-		PX4_ERR("反向过渡时间参数错误：500 < %.0f < %.0f", (double)bt_time1, (double)bt_time2);
+		PX4_ERR("back transition time parameter error: 500 < %.0f < %.0f", (double)bt_time1, (double)bt_time2);
 		return false;
 	}
 
@@ -482,7 +482,7 @@ bool Tiltrotor::checkSlewParams() const
 	const float bt_arsp_max = _param_vt_bt_arsp_max.get();
 
 	if (bt_arsp_min <= 0.0f || bt_arsp_max <= bt_arsp_min) {
-		PX4_ERR("反向过渡空速窗口错误：0 < %.1f < %.1f", (double)bt_arsp_min, (double)bt_arsp_max);
+		PX4_ERR("back transition airspeed window error: 0 < %.1f < %.1f", (double)bt_arsp_min, (double)bt_arsp_max);
 		return false;
 	}
 
@@ -496,7 +496,11 @@ bool Tiltrotor::checkSlewParams() const
 bool Tiltrotor::isAirspeedValid() const
 {
 	// 1. 传感器健康检查
-	if (!_airspeed_validated->airspeed_sensor_measurement_valid) {
+	const bool airspeed_from_sensor = _airspeed_validated->airspeed_source == airspeed_validated_s::SOURCE_SENSOR_1
+					  || _airspeed_validated->airspeed_source == airspeed_validated_s::SOURCE_SENSOR_2
+					  || _airspeed_validated->airspeed_source == airspeed_validated_s::SOURCE_SENSOR_3;
+
+	if (!airspeed_from_sensor) {
 		return false;
 	}
 
@@ -626,7 +630,7 @@ float Tiltrotor::updateTiltWithSlewRate(float current_tilt, float target_tilt)
 
 	if (pitch_error > 0.3f || roll_error > 0.3f) {  // 约17度
 		// 姿态偏差过大，暂停倾转
-		PX4_WARN("姿态偏差过大，暂停倾转 (pitch_err=%.2f, roll_err=%.2f)",
+		PX4_WARN("attitude error too large, pausing tilt (pitch_err=%.2f, roll_err=%.2f)",
 			 (double)pitch_error, (double)roll_error);
 		return current_tilt;
 	}
@@ -649,14 +653,14 @@ void Tiltrotor::autoAirspeedTilt(AirspeedTiltMode mode)
 
 		// 参数有效性检查
 		if (!checkSlewParams()) {
-			PX4_ERR("倾转参数无效，禁用基于空速的倾转控制");
+			PX4_ERR("tilt parameters invalid, disabling airspeed-based tilt control");
 			_tilt_mode = AirspeedTiltMode::NONE_ACT;
 			return;
 		}
 
 		// 空速有效性检查
 		if (!isAirspeedValid()) {
-			PX4_WARN("空速数据无效，回退到基于时间的倾转控制");
+			PX4_WARN("airspeed data invalid, falling back to time-based tilt control");
 			// 这里应该回退到原有的基于时间的控制逻辑
 			// 当前简化处理：保持当前倾角
 			return;
@@ -667,7 +671,7 @@ void Tiltrotor::autoAirspeedTilt(AirspeedTiltMode mode)
 			// 注意：PX4中倾转速率不是参数，而是硬编码的
 			// 这里仅作为示例，实际需要根据PX4架构调整
 			_rate_inited = true;
-			PX4_INFO("启用动态倾转速率控制");
+			PX4_INFO("dynamic tilt rate control enabled");
 		}
 
 		// 获取当前空速
@@ -685,7 +689,7 @@ void Tiltrotor::autoAirspeedTilt(AirspeedTiltMode mode)
 			// 恢复原始速率（如果启用了动态速率控制）
 			if (_rate_inited) {
 				_rate_inited = false;
-				PX4_INFO("正向过渡完成，恢复原始倾转速率");
+				PX4_INFO("front transition complete, restoring original tilt rate");
 			}
 		}
 
@@ -707,19 +711,19 @@ void Tiltrotor::updateBackTransitionState()
 	const hrt_abstime now = hrt_absolute_time();
 
 	switch (_back_transition_state) {
-	case BackTransitionState::CHECK:
+	case BackTransitionState::CHECK: {
 		// 等待空速进入触发窗口
 		if (PX4_ISFINITE(airspeed) && airspeed >= arsp_min && airspeed <= arsp_max) {
 			_back_transition_state = BackTransitionState::TIMER;
 			_back_transition_start_ts = now;
 			_back_tilt_active = true;
-			PX4_INFO("反向过渡开始：空速=%.1f m/s", (double)airspeed);
+			PX4_INFO("back transition started: airspeed=%.1f m/s", (double)airspeed);
 			break;
 		}
 
 		// 超时强制触发（10秒）
 		if ((now - _transition_start_timestamp) > 10_s) {
-			PX4_WARN("反向过渡超时，强制触发");
+			PX4_WARN("back transition timeout, forcing start");
 			_back_transition_state = BackTransitionState::TIMER;
 			_back_transition_start_ts = now;
 			_back_tilt_active = true;
@@ -728,7 +732,7 @@ void Tiltrotor::updateBackTransitionState()
 
 		// 高度强制触发（低于50m）
 		if (_local_pos->z < -50.0f) {
-			PX4_WARN("高度过低，强制反向过渡");
+			PX4_WARN("altitude too low, forcing back transition");
 			_back_transition_state = BackTransitionState::TIMER;
 			_back_transition_start_ts = now;
 			_back_tilt_active = true;
@@ -740,7 +744,7 @@ void Tiltrotor::updateBackTransitionState()
 			const float ground_speed = sqrtf(_local_pos->vx * _local_pos->vx + _local_pos->vy * _local_pos->vy);
 
 			if (ground_speed < 3.0f) {
-				PX4_WARN("地速过低，强制反向过渡");
+				PX4_WARN("ground speed too low, forcing back transition");
 				_back_transition_state = BackTransitionState::TIMER;
 				_back_transition_start_ts = now;
 				_back_tilt_active = true;
@@ -749,8 +753,9 @@ void Tiltrotor::updateBackTransitionState()
 		}
 
 		break;
+	}
 
-	case BackTransitionState::TIMER:
+	case BackTransitionState::TIMER: {
 		// 执行反向倾转
 		_back_timer_ms = (now - _back_transition_start_ts) / 1000.0f;
 
@@ -765,18 +770,19 @@ void Tiltrotor::updateBackTransitionState()
 		    fabsf(_tilt_control - _param_vt_tilt_mc.get()) < 0.01f) {
 			_back_transition_state = BackTransitionState::DONE;
 			_back_tilt_active = false;
-			PX4_INFO("反向过渡完成");
+			PX4_INFO("back transition complete");
 		}
 
 		// 倾转卡死保护（15秒）
 		if ((now - _back_transition_start_ts) > 15_s) {
-			PX4_ERR("反向过渡卡死，强制完成");
+			PX4_ERR("back transition stuck, forcing complete");
 			_back_transition_state = BackTransitionState::DONE;
 			_tilt_control = _param_vt_tilt_mc.get();  // 强制归零
 			_back_tilt_active = false;
 		}
 
 		break;
+	}
 
 	case BackTransitionState::DONE:
 		// 保持MC倾角
