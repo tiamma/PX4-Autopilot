@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# board specific extras init for AET-H743-Basic
+#------------------------------------------------------------------------------
+
+# Analog OSD on SPI2 (AT7456E/MAX7456 compatible)
+if ! param compare OSD_ATXXXX_CFG 0
+then
+	atxxxx start -s
+fi
+
+# AET-H743-Basic has built-in Bluetooth on UART7
+# mavlink start -d /dev/ttyS5 -b 115200

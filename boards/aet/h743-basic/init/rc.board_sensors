@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# board specific sensors init for AET-H743-Basic V2
+# IMU: BMI088 (SPI1) + BMI270 (SPI4)
+# Baro: SPL06 + DPS310 (I2C internal)
+# No built-in compass
+#------------------------------------------------------------------------------
+
+board_adc start
+
+# IMU1: BMI088 on SPI1 (accel CS=PC15, gyro CS=PE11)
+bmi088 -A -s -R 10 start
+bmi088 -G -s -R 10 start
+
+# IMU2: BMI270 on SPI4 (CS=PC13)
+bmi270 -s -R 8 start
+
+# Internal barometer: 0x76 is confirmed on the BMI board, but different
+# production batches may use pin-compatible pressure sensors. Start only the
+# first matching driver. Keep 0x77 fallbacks for other board revisions.
+if ! spl06 -I -b 2 -a 0x76 start
+then
+	if ! spl06 -I -b 2 -a 0x77 start
+	then
+		if ! dps310 -I -b 2 -a 0x76 start
+		then
+			if ! dps310 -I -b 2 -a 0x77 start
+			then
+				if ! spa06 -I -b 2 -a 0x76 start
+				then
+					if ! bmp388 -I -b 2 -a 0x76 start
+					then
+						if ! bmp280 -I -b 2 -a 0x76 start
+						then
+							ms5611 -I -b 2 -a 0x76 start
+						fi
+					fi
+				fi
+			fi
+		fi
+	fi
+fi
