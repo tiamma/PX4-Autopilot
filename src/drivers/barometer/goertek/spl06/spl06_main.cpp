@@ -82,8 +82,8 @@ I2CSPIDriverBase *SPL06::instantiate(const I2CSPIDriverConfig &config, int runti
 	}
 
 	if (interface->init() != OK) {
+		PX4_ERR("I2C init failed: bus %i addr 0x%02x", config.bus, config.i2c_address);
 		delete interface;
-		PX4_DEBUG("no device on bus %i", config.bus);
 		return nullptr;
 	}
 

@@ -14,7 +14,7 @@ icm42688p -b 4 -s -R 27 start
 
 
 # Internal baro
-spl06 -I start
+spl06 -X -a 0x76 start
 
 icp201xx -I start
 

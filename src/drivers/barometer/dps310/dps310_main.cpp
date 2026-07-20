@@ -54,7 +54,7 @@ DPS310::print_usage()
 	PRINT_MODULE_USAGE_COMMAND("start");
 #if defined(CONFIG_I2C)
 	PRINT_MODULE_USAGE_PARAMS_I2C_SPI_DRIVER(true, true);
-	PRINT_MODULE_USAGE_PARAMS_I2C_ADDRESS(0x77);
+	PRINT_MODULE_USAGE_PARAMS_I2C_ADDRESS(0x76);
 #else
 	PRINT_MODULE_USAGE_PARAMS_I2C_SPI_DRIVER(false, true);
 #endif
@@ -108,7 +108,7 @@ extern "C" int dps310_main(int argc, char *argv[])
 
 #if defined(CONFIG_I2C)
 	BusCLIArguments cli {true, true};
-	cli.i2c_address = 0x77;
+	cli.i2c_address = 0x76;
 	cli.default_i2c_frequency = 400000;
 #else
 	BusCLIArguments cli {false, true};

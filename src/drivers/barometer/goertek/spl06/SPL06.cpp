@@ -142,8 +142,10 @@ SPL06::init()
 	usleep(10000);
 
 	// check id
-	if (_interface->get_reg(SPL06_ADDR_ID) != SPL06_VALUE_ID) {
-		PX4_DEBUG("id of your baro is not: 0x%02x", SPL06_VALUE_ID);
+	uint8_t chip_id = _interface->get_reg(SPL06_ADDR_ID);
+
+	if (chip_id != SPL06_VALUE_ID) {
+		PX4_ERR("SPL06 ID mismatch: got 0x%02x, expected 0x%02x", chip_id, SPL06_VALUE_ID);
 		return -EIO;
 	}
 
@@ -158,7 +160,8 @@ SPL06::init()
 	}
 
 	if (tries < 0) {
-		PX4_DEBUG("spl06 cal failed");
+		uint8_t meas_cfg = _interface->get_reg(SPL06_ADDR_MEAS_CFG);
+		PX4_ERR("SPL06 cal not ready, MEAS_CFG=0x%02x (bit7=coef_rdy, bit6=sensor_rdy)", meas_cfg);
 		return -EIO;
 	}
 

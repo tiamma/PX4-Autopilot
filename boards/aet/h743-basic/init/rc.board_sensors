@@ -22,8 +22,6 @@ bmi270 -s -R 8 start
 # Internal baro
 spl06 -I start
 
-icp201xx -I start
-
 # mag
 ist8310 -X -q start
 
