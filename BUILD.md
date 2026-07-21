@@ -12,3 +12,16 @@ i2cdetect -b 2
 
 
 make cuav_fmu-v6x_default boardconfig
+git config --global http.proxy http://127.0.0.1:7897
+git config --global https.proxy http://127.0.0.1:7897
+git fetch
+
+
+git submodule update --init --recursive
+
+
+git remote -v
+git config --global --get-regexp "http.*proxy"
+
+git config --global --unset http.proxy
+git config --global --unset https.proxy
