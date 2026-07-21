@@ -19,8 +19,17 @@ bmi270 -s -R 8 start
 # production batches may use pin-compatible pressure sensors. Start only the
 # first matching driver. Keep 0x77 fallbacks for other board revisions.
 
-# Internal baro
-spl06 -I start
+# Internal baro (SPL06/DPS310 fallback on internal I2C2)
+if ! spl06 -I -b 2 -q -a 0x76 start
+then
+	if ! spl06 -I -b 2 -q -a 0x77 start
+	then
+		if ! dps310 -I -b 2 -q -a 0x76 start
+		then
+			dps310 -I -b 2 -a 0x77 start
+		fi
+	fi
+fi
 
 # mag
 ist8310 -X -q start

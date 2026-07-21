@@ -37,7 +37,7 @@
 
 #if defined(CONFIG_I2C)
 
-#define I2C_BUS_MAX_BUS_ITEMS 2
+#define I2C_BUS_MAX_BUS_ITEMS 4
 
 struct px4_i2c_bus_t {
 	int bus{-1}; ///< physical bus number (1, ...) (-1 means this is unused)

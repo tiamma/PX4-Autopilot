@@ -26,5 +26,3 @@ param set-default MSP_OSD_CONFIG 202
 param set-default CA_AIRFRAME 0
 param set-default CA_ROTOR_COUNT 4
 param set-default CBRK_SUPPLY_CHK 894281
-
-param set-default SENS_EN_SPL06 1
