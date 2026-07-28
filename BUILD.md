@@ -21,3 +21,11 @@ git config --global --unset https.proxy
 
 
 make cuav_fmu-v6x_default
+
+
+wget -e "http_proxy=socks5://127.0.0.1:7897" "https://github.com/microsoft/onnxruntime/releases/download/v1.12.1/onnxruntime-win-x64-gpu-1.12.1.zip"
+
+
+curl -x http://127.0.0.1:7897 -LO https://github.com/microsoft/onnxruntime/releases/download/v1.12.1/onnxruntime-win-x64-gpu-1.12.1.zip
+
+curl -x http://127.0.0.1:7897 -LO https://raw.githubusercontent.com/nlohmann/json/v3.11.3/single_include/nlohmann/json.hpp
