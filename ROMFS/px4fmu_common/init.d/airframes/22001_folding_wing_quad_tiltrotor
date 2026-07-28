@@ -25,7 +25,7 @@ param set-default CA_ROTOR0_TILT 1
 param set-default CA_ROTOR1_TILT 2
 param set-default CA_ROTOR2_TILT 3
 param set-default CA_ROTOR3_TILT 4
-param set-default CA_SV_TL_COUNT 4
+param set-default CA_SV_TL_COUNT 1
 
 # Conventional fixed-wing control surfaces: left/right aileron,
 # elevator and rudder.
