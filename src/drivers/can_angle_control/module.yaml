@@ -1,0 +1,108 @@
+module_name: CAN Angle Control Driver
+
+parameters:
+  - group: CAN Angle Control
+    definitions:
+      CANANG_ENABLE:
+        description:
+          short: Enable CAN angle control driver
+        type: boolean
+        default: 0
+
+      CANANG_CAN_DEV:
+        description:
+          short: CAN device index
+          long: |
+            Index of the CAN device to use, e.g. 0 for /dev/can0.
+        type: int32
+        default: 0
+        min: 0
+        max: 3
+
+      CANANG_TX_ID:
+        description:
+          short: Command CAN ID
+          long: |
+            Standard 11-bit CAN ID used for the target-angle command frame.
+        type: int32
+        default: 512
+        min: 0
+        max: 2047
+
+      CANANG_RX_ID:
+        description:
+          short: Feedback CAN ID
+          long: |
+            Standard 11-bit CAN ID used for the actual-angle feedback frame.
+        type: int32
+        default: 513
+        min: 0
+        max: 2047
+
+      CANANG_MIN:
+        description:
+          short: Minimum allowed angle
+          long: |
+            Minimum allowed target angle in degrees.
+        type: float
+        default: -90.0
+        min: -180.0
+        max: 180.0
+
+      CANANG_MAX:
+        description:
+          short: Maximum allowed angle
+          long: |
+            Maximum allowed target angle in degrees.
+        type: float
+        default: 90.0
+        min: -180.0
+        max: 180.0
+
+      CANANG_SLEW:
+        description:
+          short: Maximum angle slew rate
+          long: |
+            Maximum rate of angle change in degrees per second.
+            Set to 0 to disable slew-rate limiting.
+        type: float
+        default: 0.0
+        min: 0.0
+
+      CANANG_TOUT:
+        description:
+          short: Communication timeout
+          long: |
+            Timeout for command/feedback in milliseconds.
+        type: float
+        default: 200.0
+        min: 50.0
+
+      CANANG_OFFS:
+        description:
+          short: Angle offset
+          long: |
+            Installation zero offset in degrees. Applied before limits and direction.
+        type: float
+        default: 0.0
+        min: -180.0
+        max: 180.0
+
+      CANANG_DIR:
+        description:
+          short: Angle direction
+        type: enum
+        default: 0
+        values:
+          0: Normal
+          1: Reversed
+
+      CANANG_BITRATE:
+        description:
+          short: CAN bitrate
+          long: |
+            CAN bus bitrate in bits per second. Set to 0 to use the board default.
+        type: int32
+        default: 0
+        min: 0
+        max: 5000000
