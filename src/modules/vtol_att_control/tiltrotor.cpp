@@ -42,6 +42,8 @@
 #include "tiltrotor.h"
 #include "vtol_att_control_main.h"
 
+#include <systemlib/mavlink_log.h>
+
 using namespace matrix;
 
 #define FRONTTRANS_THR_MIN 0.25f
@@ -183,6 +185,33 @@ void Tiltrotor::update_mc_state()
 
 	_tilt_control = VtolType::pusher_assist() + _param_vt_tilt_mc.get();
 	_mc_yaw_weight = 1.0f;
+
+	// 打印 angle angle_setpoint的值到qgc
+	can_angle_status_s can_status{};
+
+	if (_can_angle_status_sub.update(&can_status)) {
+		const hrt_abstime now = hrt_absolute_time();
+
+		if (now - _last_can_angle_log > 1000000ULL) {
+			mavlink_log_info(&_mavlink_log_pub, "[tilt] can angle_sp=%.3f rad, angle=%.3f rad",
+					 (double)can_status.angle_setpoint, (double)can_status.angle);
+			_last_can_angle_log = now;
+		}
+	}
+
+	// // 测试：每隔 1 秒把 can_angle_command.angle_setpoint 从 0° 步进到 15°，步长 1°，循环
+	// const hrt_abstime now = hrt_absolute_time();
+
+	// if (now - _last_angle_cmd_time > 1000000ULL) {
+	// 	can_angle_command_s cmd{};
+	// 	cmd.timestamp = now;
+	// 	cmd.enable = true;
+	// 	cmd.angle_setpoint = math::radians(static_cast<float>(_test_angle_deg));
+	// 	// 0..15° -> rad
+	// 	_can_angle_cmd_pub.publish(cmd);
+	// 	// _test_angle_deg = (_test_angle_deg + 1) % 16; // 范围 0..15，每秒 +1°
+	// 	_last_angle_cmd_time = now;
+	// }
 }
 
 void Tiltrotor::update_fw_state()

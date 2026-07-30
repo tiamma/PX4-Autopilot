@@ -79,5 +79,13 @@ bmp581 -b 2 -X -a 0x47 start
 # External compass on GPS1/I2C1 (the 3rd external bus): standard Holybro Pixhawk 4 or CUAV V5 GPS/compass puck (with lights, safety button, and buzzer)
 ist8310 -X -b 1 -R 10 start
 
+# CAN angle control defaults and auto-start (can1 / CAN2)
+param set-default CA_CTRL_ENABLE 1
+param set-default CA_CTRL_DEV 0
+param set-default CA_CTRL_TX_ID 512
+param set-default CA_CTRL_RX_ID 513
+ifup can0
+can_angle_control start
+
 unset INA_CONFIGURED
 unset HAVE_PM2

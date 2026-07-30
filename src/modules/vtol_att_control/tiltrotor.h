@@ -45,6 +45,9 @@
 #include <drivers/drv_hrt.h>
 
 #include <uORB/Publication.hpp>
+#include <uORB/Subscription.hpp>
+#include <uORB/topics/can_angle_status.h>
+#include <uORB/topics/can_angle_command.h>
 #include <uORB/topics/tiltrotor_extra_controls.h>
 
 /**
@@ -99,6 +102,12 @@ private:
 	vtol_mode _vtol_mode{vtol_mode::MC_MODE};			/**< vtol flight mode, defined by enum vtol_mode */
 
 	uORB::Publication<tiltrotor_extra_controls_s>	_tiltrotor_extra_controls_pub{ORB_ID(tiltrotor_extra_controls)};
+	uORB::Publication<can_angle_command_s> _can_angle_cmd_pub{ORB_ID(can_angle_command)};
+	uORB::Subscription _can_angle_status_sub{ORB_ID(can_angle_status)};
+	orb_advert_t _mavlink_log_pub{nullptr};
+	hrt_abstime _last_can_angle_log{0};
+	hrt_abstime _last_angle_cmd_time{0};
+	uint8_t _test_angle_deg{0}; /**< test setpoint: 0..15 degrees, step 1°/s */
 
 	float _tilt_control{0.0f};		/**< actuator value for the tilt servo */
 

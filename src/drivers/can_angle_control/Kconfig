@@ -1,0 +1,5 @@
+menuconfig DRIVERS_CAN_ANGLE_CONTROL
+	bool "can_angle_control"
+	default n
+	---help---
+		Driver for controlling an angle actuator over a CAN bus using socketCAN.

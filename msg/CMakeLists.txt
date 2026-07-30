@@ -52,6 +52,8 @@ set(msg_files
 	CameraCapture.msg
 	CameraStatus.msg
 	CameraTrigger.msg
+	CanAngleCommand.msg
+	CanAngleStatus.msg
 	CanInterfaceStatus.msg
 	CellularStatus.msg
 	CollisionConstraints.msg

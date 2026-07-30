@@ -1,0 +1,10 @@
+uint64 timestamp
+uint64 timestamp_sample
+float32 angle_setpoint
+float32 angle
+bool enabled
+bool communication_ok
+uint16 device_error
+uint32 rx_count
+uint32 tx_count
+uint32 error_count
