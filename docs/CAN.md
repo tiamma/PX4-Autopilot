@@ -294,3 +294,8 @@ raw = int(round(angle_deg * 100))
 d0 = raw & 0xFF
 d1 = (raw >> 8) & 0xFF
 ```
+
+
+
+RROR [can_angle_control] Failed to get CAN interface index for can1
+RROR [can_angle_control] Failed to get CAN interface index for can1

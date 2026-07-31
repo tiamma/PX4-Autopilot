@@ -18,7 +18,7 @@ COUNTER = 0               # Frame counter (0..255)
 CAN_ID = 0x201            # Feedback frame ID (CA_CTRL_RX_ID) for testing FCU input
 
 INTERFACE = "slcan"       # "slcan" uses a serial USB-CAN adapter, "socketcan" uses a slcan0 interface
-PORT = "/dev/ttyACM2"     # Serial port for slcan (only used when INTERFACE == "slcan")
+PORT = "/dev/ttyACM1"     # Serial port for slcan (only used when INTERFACE == "slcan")
 CHANNEL = "slcan0"        # SocketCAN channel (only used when INTERFACE == "socketcan")
 BITRATE = 1000000         # CAN bitrate
 
