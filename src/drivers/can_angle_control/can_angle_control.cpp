@@ -266,13 +266,9 @@ void CanAngleControl::receive_feedback()
 {
 #if defined(__PX4_NUTTX) && defined(CONFIG_NET_CAN)
 
-	mavlink_log_info(&_mavlink_log_pub, "[can_angle] start receiving feedback 1");
-
 	if (_fd < 0) {
 		return;
 	}
-
-	mavlink_log_info(&_mavlink_log_pub, "[can_angle] start receiving feedback 2");
 
 	struct pollfd fds {};
 	fds.fd = _fd;
